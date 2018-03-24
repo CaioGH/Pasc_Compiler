@@ -3,6 +3,9 @@ package states;
 
 class state6
     {
+    
+    static state7 s7 = new state7 ();
+    
         public void takeAChar (char c)
         {
             if (c == '/')
@@ -12,7 +15,7 @@ class state6
             else if (c == '*')
             {
                // return new Token(Type.SMB_OPC, "/*", row, column);  
-               // chamar outro state
+              s7.takeAChar (c);
             }
             else
             {
