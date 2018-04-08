@@ -1,6 +1,7 @@
 package test;
 
 import java.io.*;
+import jdk.nashorn.internal.runtime.regexp.joni.Regex;
 
 public class Lexer
     {
@@ -93,7 +94,7 @@ public class Lexer
                       }
                   }
         }
-
+    
     public Token proxToken() throws IOException
         {
 
@@ -314,7 +315,7 @@ public class Lexer
                     break;
 
                 case 15:
-                    if (Character.isLetterOrDigit (c) || c == '_')
+                    if (Character.isUnicodeIdentifierPart(c))
                       {
                         lexeme.append (c);
                       }
@@ -348,13 +349,11 @@ public class Lexer
                 case 23:
                     if (c == '/')
                       {
-                        estado = 24;
-                        return new Token (Type.SMB_LIC, "//", line, column);
+                        estado = 40;
                       }
                     else if (c == '*')
                       {
                         estado = 25;
-                        return new Token (Type.SMB_OPC, "/*", line, column);
                       }
                     else
                       {
@@ -362,7 +361,7 @@ public class Lexer
                       }
 
                 case 25:
-                    if (Character.isLetterOrDigit (c) || c == '_')
+                    if (Character.isUnicodeIdentifierPart(c))
                       {
                         lexeme.append (c);
                         // Permanece no estado 25
@@ -376,7 +375,7 @@ public class Lexer
                     if (c == '/')
                       {
                         estado = 28;
-                        return new Token (Type.SMB_CSC, "*/", line, column);
+                        return new Token (Type.SMB_COME, lexeme.toString (), line, column);
                       }
                     else
                       {
@@ -395,10 +394,10 @@ public class Lexer
                       }
                     break;
                 case 34:
-
+                    
                     nextChar (c);  
                  
-                    if (Character.isLetterOrDigit (c))
+                    if (Character.isUnicodeIdentifierPart(c) || c == '@' || c == '#' || c == '!' || c == '$' || c == '%' || c == '^' || c == '*' || c == '(' || c == ')' || c == ',' || c == '.' || c == '<' || c == '>' || c == '~' || c == '`' || c == '[' || c == ']' || c == '{' || c == '}' || c == '/' || c == '+' || c == '=' || c == '-')
                       {
 
                         returnCharPosition ();
@@ -430,7 +429,7 @@ public class Lexer
                       {
                         EM.lexerError ("Caractere inesperado " + c + " na linha " + line + " e coluna " + column);
                       }
-              
+
                     break;
 
 
@@ -441,7 +440,7 @@ public class Lexer
                     lexeme.append (c);
                    
 
-                    if (Character.isLetterOrDigit (c))
+                    if (Character.isUnicodeIdentifierPart(c))
                       {
                       returnCharPosition ();
                       }
@@ -478,6 +477,16 @@ public class Lexer
                         lexeme.append (c);
                         estado = 34;
                     }
+                
+                case 40:
+                    if (Character.isUnicodeIdentifierPart(c))
+                      {
+                        lexeme.append (c);
+                      }
+                    else if (c == '\n')
+                      {
+                        return new Token (Type.SMB_LIC, lexeme.toString (), line, column);
+                      }
                     
               }
 
