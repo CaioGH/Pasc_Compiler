@@ -49,6 +49,7 @@ public enum Type
 	SMB_OPC, // /*
  	SMB_CSC, // */
  	SMB_LIC, // //
+        SMB_COME, // Exibe o comentario de varias linhas
         
         EOF
 
