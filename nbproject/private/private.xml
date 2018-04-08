@@ -3,10 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/caios/Desktop/Pasc_Compiler/Pasc_Compiler/src/Lexer/Compiler.java</file>
-            <file>file:/C:/Users/caios/Desktop/Pasc_Compiler/Pasc_Compiler/src/states/state1.java</file>
-            <file>file:/C:/Users/caios/Desktop/Pasc_Compiler/Pasc_Compiler/src/Util/Token.java</file>
-            <file>file:/C:/Users/caios/Desktop/Pasc_Compiler/Pasc_Compiler/src/Util/File.java</file>
+            <file>file:/C:/Users/caios/Desktop/Test/src/test/Compiler.java</file>
+            <file>file:/C:/Users/caios/Desktop/Test/src/test/File.java</file>
+            <file>file:/C:/Users/caios/Desktop/Test/src/test/Lexer.java</file>
+            <file>file:/C:/Users/caios/Desktop/Test/src/test/ErrorMessages.java</file>
+            <file>file:/C:/Users/caios/Desktop/Test/src/test/Token.java</file>
         </group>
     </open-files>
 </project-private>

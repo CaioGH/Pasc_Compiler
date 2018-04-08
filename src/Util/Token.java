@@ -15,6 +15,11 @@ public class Token
 		this.column = column;
 	}
 
+    Token()
+        {
+        throw new UnsupportedOperationException ("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
 		public String getLexeme()
 		{
 			return lexeme;

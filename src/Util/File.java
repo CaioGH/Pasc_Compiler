@@ -9,28 +9,32 @@ import states.state1;
 
 public class File
     {
-
+    static  int rowCount = 0, columnCount = 0, i = 0;
+    
     public static void read(String path) throws IOException
         {
         FileInputStream input = new FileInputStream(path);
         InputStreamReader inputFormat = new InputStreamReader(input);
-        BufferedReader buffRead = new BufferedReader (new FileReader (path));
+        BufferedReader br = new BufferedReader (new FileReader (path));
 
-        int rowCount = 0, columnCount = 0, i = 0;
+   
         state1 s1 = new state1();
                
-        int c = inputFormat.read();
+        int c = inputFormat.read(); 
+        String line = br.readLine();
 	   
         while(c!=-1)
                   
             {	    	   
-                System.out.println ((char)c);
+                System.out.print ((char)c);
                 s1.takeAChar ((char) c);
                 c = inputFormat.read();
                 columnCount++;
             }
         
-            System.out.println ("colunas" + columnCount);         
+            System.out.println ("\n colunas" + columnCount);         
                
+                        
+    
    }
 }
