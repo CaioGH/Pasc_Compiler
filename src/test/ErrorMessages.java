@@ -29,7 +29,7 @@ public class ErrorMessages
     
     public void lexerError(String message)
         {    
-            System.out.println("[Erro Léxico]: " + message + "\n" );
+            System.out.println("[Erro Léxico]: " + message.replace("\n", "|QuebraLin|").replace("\r", "|QuebraLin|").replace("\t", "|TAB|") + "\n" );
         }
     
     }
