@@ -53,30 +53,4 @@ public class Token {
         return "<" + classType + ", \"" + lexeme + "\">";
     }
     
- 
-         public int resetColumn(int column)
-            {
-                return column = 1;
-            }     
-        
-        public int columnAdd(int column)
-            {
-                return column++;
-            }
-        
-        public int columnAddTabMode(int column)
-            {
-                return column += 3;
-            }
-        
-        public int columnReturn(int column)
-            {
-                return column--;
-            }
-       
-        public int lineAdd(int line)
-            {
-                return line++;
-            }
-
 }
