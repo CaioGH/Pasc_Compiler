@@ -6,6 +6,17 @@ public enum Type
     //KeyWord
 
 	KW,
+        KW_PROG,
+        KW_IF,
+        KW_ELSE,
+        KW_WHILE,
+        KW_WRITE,
+        KW_READ,
+        KW_NUM,
+        KW_CHAR,
+        KW_NOT,
+        KW_OR,
+        KW_AND,
 
 	//Idenficador
 

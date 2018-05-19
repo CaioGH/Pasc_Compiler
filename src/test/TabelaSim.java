@@ -11,37 +11,37 @@ public class TabelaSim {
         symbolTable = new HashMap();
 
         Token word;
-        word = new Token(Type.KW, "program", 0, 0);
+        word = new Token(Type.KW_PROG, "program", 0, 0);
         this.symbolTable.put(word, new Identifier());
 
-        word = new Token(Type.KW, "if", 0, 0);
+        word = new Token(Type.KW_IF, "if", 0, 0);
         this.symbolTable.put(word, new Identifier());
 
-        word = new Token(Type.KW, "else", 0, 0);
+        word = new Token(Type.KW_ELSE, "else", 0, 0);
         this.symbolTable.put(word, new Identifier());
 
-        word = new Token(Type.KW, "while", 0, 0);
+        word = new Token(Type.KW_WHILE, "while", 0, 0);
         this.symbolTable.put(word, new Identifier());
 
-        word = new Token(Type.KW, "write", 0, 0);
+        word = new Token(Type.KW_WRITE, "write", 0, 0);
         this.symbolTable.put(word, new Identifier());
 
-        word = new Token(Type.KW, "read", 0, 0);
+        word = new Token(Type.KW_READ, "read", 0, 0);
         this.symbolTable.put(word, new Identifier());
 
-        word = new Token(Type.KW, "num", 0, 0);
+        word = new Token(Type.KW_NUM, "num", 0, 0);
         this.symbolTable.put(word, new Identifier());
 
-        word = new Token(Type.KW, "char", 0, 0);
+        word = new Token(Type.KW_CHAR, "char", 0, 0);
         this.symbolTable.put(word, new Identifier());
 
-        word = new Token(Type.KW, "not", 0, 0);
+        word = new Token(Type.KW_NOT, "not", 0, 0);
         this.symbolTable.put(word, new Identifier());
 
-        word = new Token(Type.KW, "or", 0, 0);
+        word = new Token(Type.KW_OR, "or", 0, 0);
         this.symbolTable.put(word, new Identifier());
 
-        word = new Token(Type.KW, "and", 0, 0);
+        word = new Token(Type.KW_AND, "and", 0, 0);
         this.symbolTable.put(word, new Identifier());
     }
 
