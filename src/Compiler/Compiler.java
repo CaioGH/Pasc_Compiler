@@ -1,9 +1,9 @@
-package test;
+package Compiler;
 
 import java.io.IOException;
-import static test.Lexer.TS;
-import static test.Lexer.column;
-import static test.Lexer.line;
+import static Compiler.Lexer.TS;
+import static Compiler.Lexer.column;
+import static Compiler.Lexer.line;
  
 public class Compiler {
 public static void main(String[] args) throws IOException
