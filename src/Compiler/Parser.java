@@ -81,13 +81,242 @@ public class Parser {
     }
 
     // decl-list → decl “;” decl-list | ε 
-    public void Decllist() {
+    public void Decllist() throws IOException {
+
+        Decl();
+
+        if (token.getClassType() == Type.SMB_SEM) {
+
+            if (token.getClassType() == Type.KW_NUM || token.getClassType() == Type.KW_CHAR) {
+
+                Decllist();
+
+            }
+        } else {
+            erroSintatico("Esperado \";\", encontrado " + token.getLexeme());
+            System.exit(1);
+        }
 
     }
-    
+
+    // decl → type id-list 
+    public void Decl() throws IOException {
+
+        if (token.getClassType() == Type.KW_NUM || token.getClassType() == Type.KW_CHAR) {
+
+            Type();
+
+        } else {
+            erroSintatico("Esperado \"num, char\", encontrado " + token.getLexeme());
+            System.exit(1);
+        }
+
+        if (token.getClassType() == Type.ID) {
+
+            Idlist();
+
+        } else {
+            erroSintatico("Esperado \"id\", encontrado " + token.getLexeme());
+            System.exit(1);
+        }
+
+    }
+
+    // type → “num” | “char” 
+    public void Type() throws IOException {
+
+        if (!eat(Type.KW_NUM) && !eat(Type.KW_CHAR)) {
+            erroSintatico("Esperado \"num, char\", encontrado " + token.getLexeme());
+            System.exit(1);
+        }
+
+    }
+
+    // id-list → “id” id-list' 
+    public void Idlist() {
+
+        if (token.getClassType() == Type.ID) {
+
+            if (token.getClassType() == Type.SMB_COM) {
+
+                Idlistlinha();
+            }
+
+        } else {
+            erroSintatico("Esperado \"id\", encontrado " + token.getLexeme());
+            System.exit(1);
+        }
+
+    }
+
+    // id-list' → “,” id-list | ε 
+    public void Idlistlinha() {
+
+        if (token.getClassType() == Type.SMB_COM) {
+
+            Idlist();
+
+        } else {
+            erroSintatico("Esperado \",\", encontrado " + token.getLexeme());
+            System.exit(1);
+        }
+
+    }
+
     // stmt-list → stmt “;” stmt-list | ε 
-    public void Stmtlist(){
-        
+    public void Stmtlist() throws IOException {
+
+        if (token.getClassType() == Type.ID || token.getClassType() == Type.KW_IF || token.getClassType() == Type.KW_WHILE || token.getClassType() == Type.KW_READ || token.getClassType() == Type.KW_WRITE) {
+
+            Stmt();
+
+            if (!eat(Type.SMB_SEM)) {
+                erroSintatico("Esperado \";\", encontrado " + token.getLexeme());
+                System.exit(1);
+            }
+
+            Stmtlist();
+
+        } else {
+            erroSintatico("Esperado \"id, if, while, read, write\", encontrado " + token.getLexeme());
+            System.exit(1);
+        }
+
+    }
+
+    // stmt → assign-stmt | if-stmt | while-stmt | read-stmt | write-stmt 
+    public void Stmt() {
+
+        if (token.getClassType() == Type.ID) {
+
+            Assignstmt();
+
+        } else if (token.getClassType() == Type.KW_IF) {
+
+            Ifstmt();
+
+        } else if (token.getClassType() == Type.KW_WHILE) {
+
+            Whilestmt();
+
+        } else if (token.getClassType() == Type.KW_READ) {
+
+            Readstmt();
+
+        } else if (token.getClassType() == Type.KW_WRITE) {
+
+            Writestmt();
+
+        } else {
+            erroSintatico("Esperado \"id, if, while, read, write\", encontrado " + token.getLexeme());
+            System.exit(1);
+        }
+
+    }
+
+    // assign-stmt → “id” “=” simple_expr 
+    public void Assignstmt() {
+
+    }
+
+    // if-stmt → “if” “(“ condition “)” “{“ stmt-list “}” if-stmt'   
+    public void Ifstmt() {
+
+    }
+
+    // if-stmt' → “else” “{“ stmt-list “}” | ε 
+    public void Ifstmtlinha() {
+
+    }
+
+    // condition → expression 
+    public void Condition() {
+
+    }
+
+    // while-stmt → stmt-prefix “{“ stmt-list “}” 
+    public void Whilestmt() {
+
+    }
+
+    // stmt-prefix → “while” “(“ condition “)” 
+    public void Stmtprefix() {
+
+    }
+
+    // read-stmt → “read” “id” 
+    public void Readstmt() {
+
+    }
+
+    // write-stmt → “write” writable 
+    public void Writestmt() {
+
+    }
+
+    // writable → simple-expr | “literal” 
+    public void Writable() {
+
+    }
+
+    // expression → simple-expr  expression' 
+    public void Expression() {
+
+    }
+
+    // expression' → relop simple-expr | ε 
+    public void Expressionlinha() {
+
+    }
+
+    // simple-expr →  term simple-expr' 
+    public void Simpleexpr() {
+
+    }
+
+    // simple-expr' → addop term simple-expr' | ε 
+    public void Simpleexprlinha() {
+
+    }
+
+    // term → factor-a term'  
+    public void Term() {
+
+    }
+
+    // term' → mulop factor-a term' | ε 
+    public void Termlinha() {
+
+    }
+
+    // factor-a → factor | “not” factor 
+    public void Factora() {
+
+    }
+
+    // factor → “id” | constant | “(“ expression “)” 
+    public void Factor() {
+
+    }
+
+    // relop → “==” | “>” | “>=” | “<” | “<=” | “!=” 
+    public void Relop() {
+
+    }
+
+    // addop → “+” | “-” | “or” 
+    public void Addop() {
+
+    }
+
+    // mulop → “*” | “/” | “and” 
+    public void Mulop() {
+
+    }
+
+    // constant → “num_const” | “char_const” 
+    public void Constant() {
+
     }
 
 }
