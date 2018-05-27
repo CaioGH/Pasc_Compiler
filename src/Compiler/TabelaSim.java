@@ -63,14 +63,13 @@ public class TabelaSim {
         return null;
     }
 
-    @Override
-    public String toString() {
-        String saida = "";
+    public void show() {
         int i = 1;
-        for (Token token : symbolTable.keySet()) {
-            saida += ("posicao " + i + ": \t" + token.toString()) + "\n";
+        
+        for (Token token : symbolTable.keySet())
+        {
+            System.out.println("posicao " + i + ": \t" + token.toString());
             i++;
         }
-        return saida;
     }
 }
