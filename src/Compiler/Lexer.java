@@ -14,6 +14,8 @@ public class Lexer {
     Token TK = new Token();
     public static int charAux = 0;
     private boolean erroas = false;
+    int estado;
+    StringBuilder lexeme;
 
     static char ESPACE = ' ';
     static char BREAK_LINE = '\n';
@@ -38,8 +40,7 @@ public class Lexer {
         }
 
         System.out.println("Tabela de simbolos:");
-        System.out.println(TS.toString());
-
+        TS.show();
     }
 
     public void returnCharPosition() {
@@ -76,9 +77,8 @@ public class Lexer {
     }
 
     public Token proxToken() throws IOException {
-
-        StringBuilder lexeme = new StringBuilder();
-        int estado = 1;
+        lexeme = new StringBuilder();
+        estado = 1;
         char c;
 
         while (true) {
@@ -103,9 +103,11 @@ public class Lexer {
 
             switch (estado) {
                 case 1:
-                    if (lastChar == EOF) {
-                        return new Token(Type.EOF, "EOF", line, column);
-                    } else if (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
+                    if (lastChar == EOF)
+                    {
+                        return AddToken(Type.EOF);
+                    }
+                    else if (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
                         estado = 1;
                     } else if (c == '=') {
                         estado = 2;
@@ -123,31 +125,31 @@ public class Lexer {
                         estado = 15;
                     } else if (c == '*') {
                         estado = 17;
-                        return new Token(Type.OP_MUL, "*", line, column);
+                        return AddToken(Type.OP_MUL);
                     } else if (c == '+') {
                         estado = 18;
-                        return new Token(Type.OP_ADD, "+", line, column);
+                        return AddToken(Type.OP_ADD);
                     } else if (c == '-') {
                         estado = 19;
-                        return new Token(Type.OP_MIN, "-", line, column);
+                        return AddToken(Type.OP_MIN);
                     } else if (c == ',') {
                         estado = 31;
-                        return new Token(Type.SMB_COM, ",", line, column);
+                        return AddToken(Type.SMB_COM, ",");
                     } else if (c == ';') {
                         estado = 30;
-                        return new Token(Type.SMB_SEM, ";", line, column);
+                        return AddToken(Type.SMB_SEM, ";");
                     } else if (c == ')') {
                         estado = 29;
-                        return new Token(Type.SMB_CPA, ")", line, column);
+                        return AddToken(Type.SMB_CPA, ")");
                     } else if (c == '(') {
                         estado = 22;
-                        return new Token(Type.SMB_OPA, "(", line, column);
+                        return AddToken(Type.SMB_OPA, "(");
                     } else if (c == '{') {
                         estado = 20;
-                        return new Token(Type.SMB_OBC, "{", line, column);
+                        return AddToken(Type.SMB_OBC, "{");
                     } else if (c == '}') {
                         estado = 21;
-                        return new Token(Type.SMB_CBC, "}", line, column);
+                        return AddToken(Type.SMB_CBC, "}");
                     } else if (c == '/') {
                         estado = 23;
                         lexeme.append(c);
@@ -167,16 +169,16 @@ public class Lexer {
                 case 2:
                     if (c == '=') {
                         estado = 3;
-                        return new Token(Type.OP_EQ, "==", line, column);
+                        return AddToken(Type.OP_EQ, "==");
                     } else {
                         returnCharPosition();
-                        return new Token(Type.OP_ASS, "=", line, column);
+                        return AddToken(Type.OP_ASS, "=");
                     }
 
                 case 5:
                     if (c == '=') {
                         estado = 6;
-                        return new Token(Type.OP_NE, "!=", line, column);
+                        return AddToken(Type.OP_NE, "!=");
                     } else {
                         EM.lexerError("Token incompleto: Esperando != na linha:" + line + " e coluna " + column);
                         estado = 1;
@@ -185,21 +187,21 @@ public class Lexer {
                 case 7:
                     if (c == '=') {
                         estado = 8;
-                        return new Token(Type.OP_LE, "<=", line, column);
+                        return AddToken(Type.OP_LE, "<=");
                     } else {
                         estado = 9;
                         returnCharPosition();
-                        return new Token(Type.OP_LT, "<", line, column);
+                        return AddToken(Type.OP_LT, "<");
                     }
 
                 case 10:
                     if (c == '=') {
                         estado = 11;
-                        return new Token(Type.OP_GE, ">=", line, column);
+                        return AddToken(Type.OP_GE, ">=");
                     } else {
                         estado = 12;
                         returnCharPosition();
-                        return new Token(Type.OP_GT, ">", line, column);
+                        return AddToken(Type.OP_GT, ">");
                     }
 
                 case 13:
@@ -212,7 +214,7 @@ public class Lexer {
                     } else {
 
                         returnCharPosition();
-                        return new Token(Type.CON_NUM, lexeme.toString(), line, column);
+                        return AddToken(Type.CON_NUM);
                     }
                     break;
 
@@ -233,7 +235,7 @@ public class Lexer {
                         estado = 14;
                     } else {
                         returnCharPosition();
-                        return new Token(Type.CON_NUM, lexeme.toString(), line, column);
+                        return AddToken(Type.CON_NUM);
                     }
 
                     break;
@@ -247,7 +249,7 @@ public class Lexer {
 
                         if (token == null) {
 
-                            return new Token(Type.ID, lexeme.toString(), line, column);
+                            return AddToken(Type.ID);
 
                         }
 
@@ -264,29 +266,39 @@ public class Lexer {
                         lexeme.append(c);
                     } else {
                         returnCharPosition();
-                        return new Token(Type.OP_DIV, "/", line, column);
+                        return AddToken(Type.OP_DIV, "/");
                     }
                     break;
 
                 case 25:
-                    if (c == '*') {
+                    if (lastChar == EOF) {
+                        EM.lexerError("Comentário multilinha não fechado na linha: " + line);
+                        closeFile();
+                        System.exit(0);
+                    }
+                    else if (c == '*') {
                         estado = 27;
                         lexeme.append(c);
-                    } else if (Character.isLetterOrDigit(c) || c == '@' || c == '#' || c == '!' || c == '$' || c == '%' || c == '^' || c == '*' || c == '(' || c == ')' || c == ',' || c == '.' || c == '<' || c == '>' || c == '~' || c == '`' || c == '[' || c == ']' || c == '{' || c == '}' || c == '/' || c == '+' || c == '=' || c == '-') {
+                    } else if (IsASCII(c)) {
                         estado = 25;
                         lexeme.append(c);
                     }
 
                     break;
                 case 27:
-                    if (c == '/') {
+                    if (lastChar == EOF) {
+                        EM.lexerError("Comentário multilinha não fechado na linha: " + line);
+                        closeFile();
+                        System.exit(0);
+                    }
+                    else if (c == '/') {
                         estado = 1;
                         lexeme.append(c);
-                        //   return new Token(Type.SMB_COME, lexeme.toString(), line, column);
+                        return AddToken(Type.SMB_COME);
                     } else if (c == '*') {
                         estado = 27;
                         lexeme.append(c);
-                    } else if (Character.isLetterOrDigit(c) || c == '@' || c == '#' || c == '!' || c == '$' || c == '%' || c == '^' || c == '*' || c == '(' || c == ')' || c == ',' || c == '.' || c == '<' || c == '>' || c == '~' || c == '`' || c == '[' || c == ']' || c == '{' || c == '}' || c == '/' || c == '+' || c == '=' || c == '-') {
+                    } else if (IsASCII(c)) {
                         estado = 25;
                         lexeme.append(c);
                     }
@@ -296,19 +308,19 @@ public class Lexer {
                         lexeme.append(c);
                     } else {
                         returnCharPosition();
-                        return new Token(Type.CON_NUM, lexeme.toString(), line, column);
+                        return AddToken(Type.CON_NUM);
                     }
                     break;
                 case 34:
                     if (c == '\"') {
                         lexeme.append(c);
                         estado = 1;
-                        return new Token(Type.LIT, lexeme.toString(), line, column);
+                        return AddToken(Type.LIT);
                     } else if (c == '\n' && !erroas) {
                         estado = 34;
                         erroas = true;
                         EM.lexerError("Erro lexico, esperando fecha aspas na linha " + line + " e coluna " + column);
-                    } else if (Character.isLetterOrDigit(c) || c == '@' || c == '#' || c == '!' || c == '$' || c == '%' || c == '^' || c == '*' || c == '(' || c == ')' || c == ',' || c == '.' || c == '<' || c == '>' || c == '~' || c == '`' || c == '[' || c == ']' || c == '{' || c == '}' || c == '/' || c == '+' || c == '=' || c == '-') {
+                    } else if (IsASCII(c)) {
                         if (!erroas) {
                             estado = 34;
                             lexeme.append(c);
@@ -320,7 +332,7 @@ public class Lexer {
 
                 case 37:
 
-                    if (Character.isLetterOrDigit(c) || c == '@' || c == '#' || c == '!' || c == '$' || c == '%' || c == '^' || c == '*' || c == '(' || c == ')' || c == ',' || c == '.' || c == '<' || c == '>' || c == '~' || c == '`' || c == '[' || c == ']' || c == '{' || c == '}' || c == '/' || c == '+' || c == '=' || c == '-') {
+                    if (IsASCII(c)) {
                         estado = 39;
                         lexeme.append(c);
                     } else {
@@ -348,24 +360,56 @@ public class Lexer {
                     if (c == '\'') {
                         estado = 1;
                         lexeme.append(c);
-                        return new Token(Type.CON_CHAR, lexeme.toString(), line, column);
+                        return AddToken(Type.CON_CHAR);
                     } else {
                         EM.lexerError("Caractere inválido " + c + " na linha: " + line + " coluna: " + column);
                     }
                     break;
 
                 case 40:
-                    if (Character.isLetterOrDigit(c) || c == '@' || c == '#' || c == '!' || c == '$' || c == '%' || c == '^' || c == '*' || c == '(' || c == ')' || c == ',' || c == '.' || c == '<' || c == '>' || c == '~' || c == '`' || c == '[' || c == ']' || c == '{' || c == '}' || c == '/' || c == '+' || c == '=' || c == '-') {
+                    if (IsASCII(c)) {
                         lexeme.append(c);
                         estado = 40;
                     } else {
                         estado = 1;
-                        //return new Token(Type.SMB_LIC, lexeme.toString(), line, column);
+                        return AddToken(Type.SMB_LIC);
                     }
                     break;
             }
 
         }
 
+    }
+    
+    private Token AddToken(Type type)
+    {
+        Token currentToken = new Token(type, lexeme.toString(), line, column);
+        
+        if (type == Type.EOF)
+        {
+            TS.put(new Token(type, "EOF", line, column), new Identifier());
+        }
+        else
+        {
+            TS.put(currentToken, new Identifier());
+        }
+        
+        return currentToken;
+    }
+
+    private Token AddToken(Type type, String sequence)
+    {
+        Token currentToken = new Token(type, sequence, line, column);
+        
+        if (type == Type.EOF)
+        {
+            TS.put(new Token(type, "EOF", line, column), new Identifier());
+        }
+        else
+        {
+            TS.put(currentToken, new Identifier());
+        }
+        
+        return currentToken;
     }
 }
