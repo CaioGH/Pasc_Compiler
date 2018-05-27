@@ -8,36 +8,49 @@ public class Parser {
     private Token token;
 
     public Parser(Lexer lexer) throws IOException {
+
         this.lexer = lexer;
         token = lexer.proxToken(); // Leitura inicial obrigatoria do primeiro simbolo
         System.out.println("[DEBUG]" + token.toString());
+
     }
 
     // Fecha os arquivos de entrada e de tokens
     public void fechaArquivos() {
 
         lexer.closeFile();
+
     }
 
     public void erroSintatico(String mensagem) {
 
         System.out.println("[Erro Sintatico] na linha " + token.getLine() + " e coluna " + token.getColumn());
         System.out.println(mensagem + "\n");
+
     }
 
     public void advance() throws IOException {
+
         token = lexer.proxToken();
+
         System.out.println("[DEBUG]" + token.toString());
+
     }
 
     // verifica token esperado t
     public boolean eat(Type t) throws IOException {
+
         if (token.getClassType() == t) {
+
             advance();
             return true;
+
         } else {
+
             return false;
+
         }
+
     }
 
     // prog → “program” “id” body 
@@ -169,7 +182,8 @@ public class Parser {
     // stmt-list → stmt “;” stmt-list | ε 
     public void Stmtlist() throws IOException {
 
-        if (token.getClassType() == Type.ID || token.getClassType() == Type.KW_IF || token.getClassType() == Type.KW_WHILE || token.getClassType() == Type.KW_READ || token.getClassType() == Type.KW_WRITE) {
+        if (token.getClassType() == Type.ID || token.getClassType() == Type.KW_IF || token.getClassType() == Type.KW_WHILE
+                || token.getClassType() == Type.KW_READ || token.getClassType() == Type.KW_WRITE) {
 
             Stmt();
 
@@ -313,9 +327,10 @@ public class Parser {
     }
 
     // condition → expression 
-    public void Condition() {
+    public void Condition() throws IOException {
 
-        if (token.getClassType() == Type.ID || token.getClassType() == Type.SMB_OPA || token.getClassType() == Type.KW_NOT || token.getClassType() == Type.CON_NUM || token.getClassType() == Type.CON_CHAR) {
+        if (token.getClassType() == Type.ID || token.getClassType() == Type.SMB_OPA || token.getClassType() == Type.KW_NOT
+                || token.getClassType() == Type.CON_NUM || token.getClassType() == Type.CON_CHAR) {
 
             Expression();
 
@@ -414,7 +429,8 @@ public class Parser {
     // writable → simple-expr | “literal” 
     public void Writable() throws IOException {
 
-        if (token.getClassType() == Type.ID || token.getClassType() == Type.SMB_OPA || token.getClassType() == Type.KW_NOT || token.getClassType() == Type.CON_NUM || token.getClassType() == Type.CON_CHAR) {
+        if (token.getClassType() == Type.ID || token.getClassType() == Type.SMB_OPA || token.getClassType() == Type.KW_NOT
+                || token.getClassType() == Type.CON_NUM || token.getClassType() == Type.CON_CHAR) {
 
             Simpleexpr();
 
@@ -428,9 +444,10 @@ public class Parser {
     }
 
     // expression → simple-expr  expression' 
-    public void Expression() {
+    public void Expression() throws IOException {
 
-        if (token.getClassType() == Type.ID || token.getClassType() == Type.SMB_OPA || token.getClassType() == Type.KW_NOT || token.getClassType() == Type.CON_NUM || token.getClassType() == Type.CON_CHAR) {
+        if (token.getClassType() == Type.ID || token.getClassType() == Type.SMB_OPA || token.getClassType() == Type.KW_NOT
+                || token.getClassType() == Type.CON_NUM || token.getClassType() == Type.CON_CHAR) {
 
             Simpleexpr();
 
@@ -448,9 +465,10 @@ public class Parser {
     }
 
     // expression' → relop simple-expr | ε 
-    public void Expressionlinha() {
+    public void Expressionlinha() throws IOException {
 
-        if (token.getClassType() == Type.OP_ASS || token.getClassType() == Type.OP_GT || token.getClassType() == Type.OP_GE || token.getClassType() == Type.OP_LT || token.getClassType() == Type.OP_LE || token.getClassType() == Type.OP_NE) {
+        if (token.getClassType() == Type.OP_ASS || token.getClassType() == Type.OP_GT || token.getClassType() == Type.OP_GE
+                || token.getClassType() == Type.OP_LT || token.getClassType() == Type.OP_LE || token.getClassType() == Type.OP_NE) {
 
             Relop();
 
@@ -464,54 +482,184 @@ public class Parser {
     }
 
     // simple-expr →  term simple-expr' 
-    public void Simpleexpr() {
-        
-        
+    public void Simpleexpr() throws IOException {
+
+        if (token.getClassType() == Type.ID || token.getClassType() == Type.SMB_OPA || token.getClassType() == Type.KW_NOT
+                || token.getClassType() == Type.CON_NUM || token.getClassType() == Type.CON_CHAR) {
+
+            Term();
+
+            if (token.getClassType() != Type.SMB_SEM && token.getClassType() != Type.SMB_CPA && token.getClassType() != Type.OP_ASS
+                    && token.getClassType() != Type.OP_GT && token.getClassType() != Type.OP_GE && token.getClassType() != Type.OP_LT
+                    && token.getClassType() != Type.OP_LE && token.getClassType() != Type.OP_NE) {
+
+                Simpleexprlinha();
+
+            }
+
+        } else {
+            erroSintatico("Esperado \"id, (, not, num_const, char_const\", encontrado " + token.getLexeme());
+            System.exit(1);
+        }
 
     }
 
     // simple-expr' → addop term simple-expr' | ε 
-    public void Simpleexprlinha() {
+    public void Simpleexprlinha() throws IOException {
+
+        if (token.getClassType() == Type.OP_ADD || token.getClassType() == Type.OP_MIN || token.getClassType() == Type.KW_OR) {
+
+            Addop();
+
+            Term();
+            
+            if (token.getClassType() != Type.SMB_SEM && token.getClassType() != Type.SMB_CPA && token.getClassType() != Type.OP_ASS
+                    && token.getClassType() != Type.OP_GT && token.getClassType() != Type.OP_GE && token.getClassType() != Type.OP_LT
+                    && token.getClassType() != Type.OP_LE && token.getClassType() != Type.OP_NE) {
+                
+                Simpleexprlinha();
+            }
+            
+
+        } else {
+            erroSintatico("Esperado \"+, -, or\", encontrado " + token.getLexeme());
+            System.exit(1);
+        }
 
     }
 
     // term → factor-a term'  
-    public void Term() {
+    public void Term() throws IOException {
+
+        if (token.getClassType() == Type.ID || token.getClassType() == Type.SMB_OPA || token.getClassType() == Type.KW_NOT
+                || token.getClassType() == Type.CON_NUM || token.getClassType() == Type.CON_CHAR) {
+
+            Factora();
+
+            if (token.getClassType() != Type.SMB_SEM && token.getClassType() != Type.SMB_CPA && token.getClassType() != Type.OP_ASS
+                    && token.getClassType() != Type.OP_GT && token.getClassType() != Type.OP_GE && token.getClassType() != Type.OP_LT
+                    && token.getClassType() != Type.OP_LE && token.getClassType() != Type.OP_NE && token.getClassType() == Type.KW_OR
+                    && token.getClassType() == Type.OP_MIN && token.getClassType() == Type.OP_ADD) {
+
+                Termlinha();
+
+            }
+
+        } else {
+            erroSintatico("Esperado \"id, (, not, num_const, char_const\", encontrado " + token.getLexeme());
+            System.exit(1);
+        }
 
     }
 
     // term' → mulop factor-a term' | ε 
-    public void Termlinha() {
+    public void Termlinha() throws IOException {
+
+        if (token.getClassType() == Type.KW_AND || token.getClassType() == Type.OP_MUL || token.getClassType() == Type.OP_DIV) {
+
+            Mulop();
+
+            Factora();
+            
+            if (token.getClassType() != Type.SMB_SEM && token.getClassType() != Type.SMB_CPA && token.getClassType() != Type.OP_ASS
+                    && token.getClassType() != Type.OP_GT && token.getClassType() != Type.OP_GE && token.getClassType() != Type.OP_LT
+                    && token.getClassType() != Type.OP_LE && token.getClassType() != Type.OP_NE && token.getClassType() == Type.KW_OR
+                    && token.getClassType() == Type.OP_MIN && token.getClassType() == Type.OP_ADD) {
+
+                Termlinha();
+
+            }
+
+        } else {
+            erroSintatico("Esperado \"and, *, /\", encontrado " + token.getLexeme());
+            System.exit(1);
+        }
 
     }
 
     // factor-a → factor | “not” factor 
-    public void Factora() {
+    public void Factora() throws IOException {
+        
+        if (token.getClassType() == Type.ID || token.getClassType() == Type.SMB_OPA || token.getClassType() == Type.CON_NUM || token.getClassType() == Type.CON_CHAR) {
+            
+            Factor();
+            
+        } else if (eat(Type.KW_NOT)) {
+            
+            Factor();
+            
+        } else {
+            erroSintatico("Esperado \"id, (, num_const, char_const, not\", encontrado " + token.getLexeme());
+            System.exit(1);
+        }
 
     }
 
     // factor → “id” | constant | “(“ expression “)” 
-    public void Factor() {
-
+    public void Factor() throws IOException {
+        
+        if (!eat(Type.ID)){
+            
+            erroSintatico("Esperado \"id\", encontrado " + token.getLexeme());
+            System.exit(1);
+            
+        } else if (token.getClassType() == Type.CON_CHAR || token.getClassType() == Type.CON_NUM) {
+            
+            Constant();
+            
+        } else if(eat(Type.SMB_OPA)) {
+            
+            Expression();
+            
+            if (!eat(Type.SMB_CPA)){
+            
+            erroSintatico("Esperado \")\", encontrado " + token.getLexeme());
+            System.exit(1);
+            }
+            
+        } else {
+            erroSintatico("Esperado \"id, (, num_const, char_const\", encontrado " + token.getLexeme());
+            System.exit(1);
+        }
     }
 
     // relop → “==” | “>” | “>=” | “<” | “<=” | “!=” 
-    public void Relop() {
+    public void Relop() throws IOException {
+        
+        if (!eat(Type.OP_EQ) && !eat(Type.OP_GT) && !eat(Type.OP_GE) && !eat(Type.OP_LT) && !eat(Type.OP_LE) && !eat(Type.OP_NE)) {
+            erroSintatico("Esperado \"==, >, >=, <, <=, !=\", encontrado " + token.getLexeme());
+            System.exit(1);
+        }
 
     }
 
     // addop → “+” | “-” | “or” 
-    public void Addop() {
+    public void Addop() throws IOException {
+        
+        if (!eat(Type.OP_ADD) && !eat(Type.OP_MIN) && !eat(Type.KW_OR)) {
+            erroSintatico("Esperado \"+, -, or\", encontrado " + token.getLexeme());
+            System.exit(1);        
+        }
 
     }
 
     // mulop → “*” | “/” | “and” 
-    public void Mulop() {
+    public void Mulop() throws IOException {
+        
+        if (!eat(Type.OP_MUL) && !eat(Type.OP_DIV) && !eat(Type.KW_AND)) {            
+            erroSintatico("Esperado \"*, /, and\", encontrado " + token.getLexeme());
+            System.exit(1);  
+        }
 
     }
 
     // constant → “num_const” | “char_const” 
-    public void Constant() {
+    public void Constant() throws IOException {
+        
+        if (!eat(Type.CON_CHAR) && !eat(Type.CON_NUM)) {
+            erroSintatico("Esperado \"num_const, char_const\", encontrado " + token.getLexeme());
+            System.exit(1); 
+        }
 
     }
 
