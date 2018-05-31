@@ -16,7 +16,7 @@ public static void main(String[] args) throws IOException
         
         Parser parser = new Parser(lexer);
         parser.Prog();
-        
+     
         TS.show();
 }
 
