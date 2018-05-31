@@ -1,5 +1,13 @@
-"abc 
-123"
+program Teste
+num var1;
+num var2;
+{
+    if(var1 >= var2)
+    {
 
-
-15.fdaf12S
+    }
+    else
+    {
+        var1 = var1 / var2;
+    };
+}
