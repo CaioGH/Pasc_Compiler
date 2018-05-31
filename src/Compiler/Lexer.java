@@ -12,7 +12,6 @@ public class Lexer {
     RandomAccessFile file_reference;
     ErrorMessages EM = new ErrorMessages();
     Token TK = new Token();
-    public static int charAux = 0;
     private boolean erroas = false;
     int estado;
     StringBuilder lexeme;
