@@ -1,0 +1,23 @@
+program 
+{
+
+%
+	num a = 15;
+	num b = 20;
+
+	resul;
+
+	c = a + b;
+
+	if (c >= 10)
+	{
+		resul = "Vitoria";
+	}
+	else
+	{
+		resul = "derrota"
+	}
+
+ola_
+@
+}

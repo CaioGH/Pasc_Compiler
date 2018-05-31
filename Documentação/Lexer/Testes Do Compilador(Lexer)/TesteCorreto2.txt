@@ -1,0 +1,11 @@
+program 
+{
+	num a = 15;
+	num b = 20;
+
+	resul;
+	s = 's';
+	c = a + b;
+
+	Lit = "Valeu";
+}
