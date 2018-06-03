@@ -1,0 +1,15 @@
+program parser
+char letra1, letra2;
+{
+	letra1 = a
+	letra2 = b;;
+	
+	if(letra1 == letra2)
+	{
+		write "Letras iguais.";
+	}
+	else
+	{
+		write "Letras diferentes";
+	}
+}
