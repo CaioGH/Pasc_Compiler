@@ -1,5 +1,7 @@
 package Compiler;
 
+import static Compiler.Lexer.column;
+import static Compiler.Lexer.line;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -14,7 +16,7 @@ public class Parser {
 
         this.lexer = lexer;
         token = lexer.proxToken(); // Leitura inicial obrigatoria do primeiro simbolo
-        System.out.println("[Token]" + token.toString());
+        //System.out.println("[Token]" + token.toString());
         tokensSincroniantes = new ArrayList<Type>();
 
     }
@@ -29,7 +31,7 @@ public class Parser {
     public void erroSintatico(String mensagem) {
 
         erros++;
-        System.out.println("[Erro Sintatico]" + mensagem + " na linha " + token.getLine() + " e coluna " + token.getColumn());
+        System.out.println("[Erro Sintatico]" + mensagem + " na linha " + line + " e coluna " + column);
 
         if (erros == 5) {
             System.out.println("5 Erros Sintáticos encontrados, finalizando sistema.");
@@ -41,7 +43,7 @@ public class Parser {
 
         token = lexer.proxToken();
 
-        System.out.println("[Token]" + token.toString());
+        //System.out.println("[Token]" + token.toString());
 
     }
 
@@ -91,7 +93,7 @@ public class Parser {
 
             Body();
         } else {
-            // token sincronizante: FOLLOW(Prog)
+            
             tokensSincroniantes.add(Type.EOF);
             sincronizaToken("[Modo Panico] Esperado \"EOF\", encontrado " + token.getLexeme());
             erroSintatico("Esperado \"program\", encontrado " + token.getLexeme());
@@ -170,10 +172,12 @@ public class Parser {
     public void Type() throws IOException {
         //System.out.println("Debug:Type");
         if (!eat(Type.KW_NUM) && !eat(Type.KW_CHAR)) {
+            tokensSincroniantes.add(Type.ID);
+            sincronizaToken("[Modo Panico] Esperado \"ID\", encontrado " + token.getLexeme());
             erroSintatico("Esperado \"num, char\", encontrado " + token.getLexeme());
 
-        }
-
+        } 
+       
     }
 
     // id-list → “id” id-list' 
@@ -184,6 +188,8 @@ public class Parser {
             Idlistlinha();
 
         } else {
+            tokensSincroniantes.add(Type.SMB_SEM);
+            sincronizaToken("[Modo Panico] Esperado \";\", encontrado " + token.getLexeme());
             erroSintatico("Esperado \"id\", encontrado " + token.getLexeme());
 
         }
@@ -261,6 +267,8 @@ public class Parser {
             Writestmt();
 
         } else {
+            tokensSincroniantes.add(Type.SMB_SEM);
+            sincronizaToken("[Modo Panico] Esperado \";\", encontrado " + token.getLexeme());
             erroSintatico("Esperado \"id, if, while, read, write\", encontrado " + token.getLexeme());
 
         }
@@ -280,6 +288,8 @@ public class Parser {
             Simpleexpr();
 
         } else {
+            tokensSincroniantes.add(Type.SMB_SEM);
+            sincronizaToken("[Modo Panico] Esperado \";\", encontrado " + token.getLexeme());
             erroSintatico("Esperado \"id\", encontrado " + token.getLexeme());
 
         }
@@ -322,6 +332,8 @@ public class Parser {
             Ifstmtlinha();
 
         } else {
+            tokensSincroniantes.add(Type.SMB_SEM);
+            sincronizaToken("[Modo Panico] Esperado \";\", encontrado " + token.getLexeme());
             erroSintatico("Esperado \"if\", encontrado " + token.getLexeme());
 
         }
@@ -380,7 +392,7 @@ public class Parser {
     // while-stmt → stmt-prefix “{“ stmt-list “}” 
     public void Whilestmt() throws IOException {
         //System.out.println("Debug:Whilestmt");
-        if (token.getClassType() != Type.KW_WHILE) {
+        if (token.getClassType() == Type.KW_WHILE) {
 
             Stmtprefix();
 
@@ -401,6 +413,8 @@ public class Parser {
             }
 
         } else {
+            tokensSincroniantes.add(Type.SMB_SEM);
+            sincronizaToken("[Modo Panico] Esperado \";\", encontrado " + token.getLexeme());
             erroSintatico("Esperado \"while\", encontrado " + token.getLexeme());
 
         }
@@ -425,6 +439,8 @@ public class Parser {
             }
 
         } else {
+            tokensSincroniantes.add(Type.SMB_SEM);
+            sincronizaToken("[Modo Panico] Esperado \";\", encontrado " + token.getLexeme());
             erroSintatico("Esperado \"while\", encontrado " + token.getLexeme());
 
         }
@@ -442,6 +458,8 @@ public class Parser {
             }
 
         } else {
+            tokensSincroniantes.add(Type.SMB_SEM);
+            sincronizaToken("[Modo Panico] Esperado \";\", encontrado " + token.getLexeme());
             erroSintatico("Esperado \"read\", encontrado " + token.getLexeme());
 
         }
@@ -456,6 +474,8 @@ public class Parser {
             Writable();
 
         } else {
+            tokensSincroniantes.add(Type.SMB_SEM);
+            sincronizaToken("[Modo Panico] Esperado \";\", encontrado " + token.getLexeme());
             erroSintatico("Esperado \"write\", encontrado " + token.getLexeme());
 
         }
@@ -473,6 +493,8 @@ public class Parser {
         } else if (eat(Type.LIT)) {
 
         } else {
+            tokensSincroniantes.add(Type.SMB_SEM);
+            sincronizaToken("[Modo Panico] Esperado \";\", encontrado " + token.getLexeme());
             erroSintatico("Esperado \"literal\", encontrado " + token.getLexeme());
 
         }
@@ -490,6 +512,8 @@ public class Parser {
             Expressionlinha();
 
         } else {
+            tokensSincroniantes.add(Type.SMB_CPA);
+            sincronizaToken("[Modo Panico] Esperado \")\", encontrado " + token.getLexeme());
             erroSintatico("Esperado \"id, (, not, num_const, char_const\", encontrado " + token.getLexeme());
 
         }
@@ -505,7 +529,7 @@ public class Parser {
 
         } else {
 
-            if (token.getClassType() == Type.OP_ASS || token.getClassType() == Type.OP_GT || token.getClassType() == Type.OP_GE
+            if (token.getClassType() == Type.OP_EQ || token.getClassType() == Type.OP_GT || token.getClassType() == Type.OP_GE
                     || token.getClassType() == Type.OP_LT || token.getClassType() == Type.OP_LE || token.getClassType() == Type.OP_NE) {
 
                 Relop();
@@ -513,7 +537,7 @@ public class Parser {
                 Simpleexpr();
 
             } else {
-                erroSintatico("Esperado \"=, >, >=, <, <=, !=\", encontrado " + token.getLexeme());
+                erroSintatico("Esperado \"==, >, >=, <, <=, !=\", encontrado " + token.getLexeme());
 
             }
         }
@@ -531,6 +555,15 @@ public class Parser {
             Simpleexprlinha();
 
         } else {
+            tokensSincroniantes.add(Type.SMB_SEM);
+            tokensSincroniantes.add(Type.OP_EQ);
+            tokensSincroniantes.add(Type.OP_GT);
+            tokensSincroniantes.add(Type.OP_GE);
+            tokensSincroniantes.add(Type.OP_LT);
+            tokensSincroniantes.add(Type.OP_LE);
+            tokensSincroniantes.add(Type.OP_NE);
+            tokensSincroniantes.add(Type.SMB_CPA);
+            sincronizaToken("[Modo Panico] Esperado \";, ==, >, >=, <, <=, !=, )\", encontrado " + token.getLexeme());
             erroSintatico("Esperado \"id, (, not, num_const, char_const\", encontrado " + token.getLexeme());
 
         }
@@ -540,7 +573,7 @@ public class Parser {
     // simple-expr' → addop term simple-expr' | ε 
     public void Simpleexprlinha() throws IOException {
         //System.out.println("Debug:Simpleexprlinha");
-        if (token.getClassType() == Type.SMB_SEM || token.getClassType() == Type.SMB_CPA || token.getClassType() == Type.OP_ASS
+        if (token.getClassType() == Type.SMB_SEM || token.getClassType() == Type.SMB_CPA || token.getClassType() == Type.OP_EQ
                 || token.getClassType() == Type.OP_GT || token.getClassType() == Type.OP_GE || token.getClassType() == Type.OP_LT
                 || token.getClassType() == Type.OP_LE || token.getClassType() == Type.OP_NE) {
 
@@ -574,6 +607,18 @@ public class Parser {
             Termlinha();
 
         } else {
+            tokensSincroniantes.add(Type.OP_ADD);
+            tokensSincroniantes.add(Type.OP_MIN);
+            tokensSincroniantes.add(Type.KW_OR);
+            tokensSincroniantes.add(Type.SMB_SEM);
+            tokensSincroniantes.add(Type.OP_EQ);
+            tokensSincroniantes.add(Type.OP_GT);
+            tokensSincroniantes.add(Type.OP_GE);
+            tokensSincroniantes.add(Type.OP_LT);
+            tokensSincroniantes.add(Type.OP_LE);
+            tokensSincroniantes.add(Type.OP_NE);
+            tokensSincroniantes.add(Type.SMB_CPA);
+            sincronizaToken("[Modo Panico] Esperado \"+, -, or, ;, ==, >, >=, <, <=, !=, )\", encontrado " + token.getLexeme());
             erroSintatico("Esperado \"id, (, not, num_const, char_const\", encontrado " + token.getLexeme());
 
         }
@@ -583,7 +628,7 @@ public class Parser {
     // term' → mulop factor-a term' | ε 
     public void Termlinha() throws IOException {
         //System.out.println("Debug:Termlinha");
-        if (token.getClassType() == Type.SMB_SEM || token.getClassType() == Type.SMB_CPA || token.getClassType() == Type.OP_ASS
+        if (token.getClassType() == Type.SMB_SEM || token.getClassType() == Type.SMB_CPA || token.getClassType() == Type.OP_EQ
                 || token.getClassType() == Type.OP_GT || token.getClassType() == Type.OP_GE || token.getClassType() == Type.OP_LT
                 || token.getClassType() == Type.OP_LE || token.getClassType() == Type.OP_NE || token.getClassType() == Type.KW_OR
                 || token.getClassType() == Type.OP_MIN || token.getClassType() == Type.OP_ADD) {
@@ -619,6 +664,21 @@ public class Parser {
             Factor();
 
         } else {
+            tokensSincroniantes.add(Type.OP_DIV);
+            tokensSincroniantes.add(Type.OP_MUL);
+            tokensSincroniantes.add(Type.KW_AND);
+            tokensSincroniantes.add(Type.OP_ADD);
+            tokensSincroniantes.add(Type.OP_MIN);
+            tokensSincroniantes.add(Type.KW_OR);
+            tokensSincroniantes.add(Type.SMB_SEM);
+            tokensSincroniantes.add(Type.OP_EQ);
+            tokensSincroniantes.add(Type.OP_GT);
+            tokensSincroniantes.add(Type.OP_GE);
+            tokensSincroniantes.add(Type.OP_LT);
+            tokensSincroniantes.add(Type.OP_LE);
+            tokensSincroniantes.add(Type.OP_NE);
+            tokensSincroniantes.add(Type.SMB_CPA);
+            sincronizaToken("[Modo Panico] Esperado \"*, /, and, +, -, or, ;, ==, >, >=, <, <=, !=, )\", encontrado " + token.getLexeme());
             erroSintatico("Esperado \"id, (, num_const, char_const, not\", encontrado " + token.getLexeme());
 
         }
@@ -647,6 +707,21 @@ public class Parser {
             }
 
         } else {
+            tokensSincroniantes.add(Type.OP_DIV);
+            tokensSincroniantes.add(Type.OP_MUL);
+            tokensSincroniantes.add(Type.KW_AND);
+            tokensSincroniantes.add(Type.OP_ADD);
+            tokensSincroniantes.add(Type.OP_MIN);
+            tokensSincroniantes.add(Type.KW_OR);
+            tokensSincroniantes.add(Type.SMB_SEM);
+            tokensSincroniantes.add(Type.OP_EQ);
+            tokensSincroniantes.add(Type.OP_GT);
+            tokensSincroniantes.add(Type.OP_GE);
+            tokensSincroniantes.add(Type.OP_LT);
+            tokensSincroniantes.add(Type.OP_LE);
+            tokensSincroniantes.add(Type.OP_NE);
+            tokensSincroniantes.add(Type.SMB_CPA);
+            sincronizaToken("[Modo Panico] Esperado \"*, /, and, +, -, or, ;, ==, >, >=, <, <=, !=, )\", encontrado " + token.getLexeme());
             erroSintatico("Esperado \"id, (, num_const, char_const\", encontrado " + token.getLexeme());
 
         }
@@ -656,6 +731,12 @@ public class Parser {
     public void Relop() throws IOException {
         //System.out.println("Debug:Relop");
         if (!eat(Type.OP_EQ) && !eat(Type.OP_GT) && !eat(Type.OP_GE) && !eat(Type.OP_LT) && !eat(Type.OP_LE) && !eat(Type.OP_NE)) {
+            tokensSincroniantes.add(Type.ID);
+            tokensSincroniantes.add(Type.CON_CHAR);
+            tokensSincroniantes.add(Type.CON_NUM);
+            tokensSincroniantes.add(Type.SMB_OPA);
+            tokensSincroniantes.add(Type.KW_NOT);
+            sincronizaToken("[Modo Panico] Esperado \"id, const_num, const_char, (, not\", encontrado " + token.getLexeme());
             erroSintatico("Esperado \"==, >, >=, <, <=, !=\", encontrado " + token.getLexeme());
 
         }
@@ -666,6 +747,12 @@ public class Parser {
     public void Addop() throws IOException {
         //System.out.println("Debug:Addop");
         if (!eat(Type.OP_ADD) && !eat(Type.OP_MIN) && !eat(Type.KW_OR)) {
+            tokensSincroniantes.add(Type.ID);
+            tokensSincroniantes.add(Type.CON_CHAR);
+            tokensSincroniantes.add(Type.CON_NUM);
+            tokensSincroniantes.add(Type.SMB_OPA);
+            tokensSincroniantes.add(Type.KW_NOT);
+            sincronizaToken("[Modo Panico] Esperado \"id, const_num, const_char, (, not\", encontrado " + token.getLexeme());
             erroSintatico("Esperado \"+, -, or\", encontrado " + token.getLexeme());
 
         }
@@ -676,6 +763,12 @@ public class Parser {
     public void Mulop() throws IOException {
         //System.out.println("Debug:Mulop");
         if (!eat(Type.OP_MUL) && !eat(Type.OP_DIV) && !eat(Type.KW_AND)) {
+            tokensSincroniantes.add(Type.ID);
+            tokensSincroniantes.add(Type.CON_CHAR);
+            tokensSincroniantes.add(Type.CON_NUM);
+            tokensSincroniantes.add(Type.SMB_OPA);
+            tokensSincroniantes.add(Type.KW_NOT);
+            sincronizaToken("[Modo Panico] Esperado \"id, const_num, const_char, (, not\", encontrado " + token.getLexeme());
             erroSintatico("Esperado \"*, /, and\", encontrado " + token.getLexeme());
 
         }
@@ -686,6 +779,21 @@ public class Parser {
     public void Constant() throws IOException {
         //System.out.println("Debug:Constant");
         if (!eat(Type.CON_CHAR) && !eat(Type.CON_NUM)) {
+            tokensSincroniantes.add(Type.OP_DIV);
+            tokensSincroniantes.add(Type.OP_MUL);
+            tokensSincroniantes.add(Type.KW_AND);
+            tokensSincroniantes.add(Type.OP_ADD);
+            tokensSincroniantes.add(Type.OP_MIN);
+            tokensSincroniantes.add(Type.KW_OR);
+            tokensSincroniantes.add(Type.SMB_SEM);
+            tokensSincroniantes.add(Type.OP_EQ);
+            tokensSincroniantes.add(Type.OP_GT);
+            tokensSincroniantes.add(Type.OP_GE);
+            tokensSincroniantes.add(Type.OP_LT);
+            tokensSincroniantes.add(Type.OP_LE);
+            tokensSincroniantes.add(Type.OP_NE);
+            tokensSincroniantes.add(Type.SMB_CPA);
+            sincronizaToken("[Modo Panico] Esperado \"*, /, and, +, -, or, ;, ==, >, >=, <, <=, !=, )\", encontrado " + token.getLexeme());
             erroSintatico("Esperado \"num_const, char_const\", encontrado " + token.getLexeme());
 
         }
