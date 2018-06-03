@@ -9,7 +9,7 @@ public class Compiler {
 public static void main(String[] args) throws IOException
         {
       
-        Lexer lexer = new Lexer ("teste1_correto.jvn");
+        Lexer lexer = new Lexer ("Teste.jvn");
        
         Token token;
         TS = new TabelaSim ();
