@@ -56,21 +56,6 @@ public class Lexer {
         }
     }
 
-    public void nextChar(char c) throws IOException {
-        lastChar = file_reference.read();
-        if (lastChar != EOF) {
-            c = (char) lastChar;
-            column++;
-
-            if (c == '\n') {
-                column = 0;
-                line++;
-            } else if (c == '\t') {
-                column += 3;
-            }
-        }
-    }
-
     private static boolean IsASCII(Character c) {
         return c.toString().matches("^[\\x20-\\xFF]*$");
     }
@@ -90,7 +75,7 @@ public class Lexer {
                     column++;
 
                     if (c == '\n') {
-                        column = 0;
+                        column = 1;
                         line++;
                     } else if (c == '\t') {
                         column += 3;
@@ -362,6 +347,7 @@ public class Lexer {
                         return AddToken(Type.CON_CHAR);
                     } else {
                         EM.lexerError("Caractere inválido " + c + " na linha: " + line + " coluna: " + column);
+                        estado = 1;
                     }
                     break;
 
