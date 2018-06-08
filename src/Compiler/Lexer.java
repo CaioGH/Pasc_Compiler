@@ -135,8 +135,7 @@ public class Lexer {
                         estado = 21;
                         return AddToken(Type.SMB_CBC, "}");
                     } else if (c == '/') {
-                        estado = 23;
-                        lexeme.append(c);
+                        estado = 23;                      
                     } else if (c == '\"') {
                         estado = 38;
 
@@ -244,11 +243,12 @@ public class Lexer {
                 case 23:
                     if (c == '*') {
                         estado = 25;
-                        lexeme.append(c);
+                     // lexeme.append(c);
                     } else if (c == '/') {
                         estado = 40;
-                        lexeme.append(c);
+                     // lexeme.append(c);
                     } else {
+                        lexeme.append(c);
                         returnCharPosition();
                         return AddToken(Type.OP_DIV, "/");
                     }
@@ -262,10 +262,10 @@ public class Lexer {
                     }
                     else if (c == '*') {
                         estado = 27;
-                        lexeme.append(c);
+                     // lexeme.append(c);
                     } else if (IsASCII(c)) {
                         estado = 25;
-                        lexeme.append(c);
+                     // lexeme.append(c);
                     }
 
                     break;
@@ -277,14 +277,14 @@ public class Lexer {
                     }
                     else if (c == '/') {
                         estado = 1;
-                        lexeme.append(c);
-                        return AddToken(Type.SMB_COME);
+                    //  lexeme.append(c);
+                     // return AddToken(Type.SMB_COME);
                     } else if (c == '*') {
                         estado = 27;
-                        lexeme.append(c);
+                    //  lexeme.append(c);
                     } else if (IsASCII(c)) {
                         estado = 25;
-                        lexeme.append(c);
+                    //  lexeme.append(c);
                     }
                     break;
                 case 33:
@@ -353,11 +353,11 @@ public class Lexer {
 
                 case 40:
                     if (IsASCII(c)) {
-                        lexeme.append(c);
+                     // lexeme.append(c);
                         estado = 40;
                     } else {
                         estado = 1;
-                        return AddToken(Type.SMB_LIC);
+                     // return AddToken(Type.SMB_LIC);
                     }
                     break;
             }
